@@ -9,7 +9,7 @@ namespace SecurePhotoVaultMAUI.SecureStorage
 {
     public class ImageCryptoService
     {
-        public static async Task EncryptImageAsync(string inputPath, string outputPath)
+        public static async Task EncryptImageAsync(string inputPath)
         {
             var key = await CryptoService.GetOrCreateKeyAsync();
 
@@ -17,16 +17,15 @@ namespace SecurePhotoVaultMAUI.SecureStorage
             aes.Key = key;
             aes.GenerateIV();
 
+            var outputFileName = $"encrypted_{Guid.NewGuid()}.img";
+            var outputPath = Path.Combine(FileSystem.AppDataDirectory, outputFileName);
+
             await using var fileStream = new FileStream(outputPath, FileMode.Create);
-            await fileStream.WriteAsync(aes.IV); // Write IV first
+            await fileStream.WriteAsync(aes.IV);
 
             await using var inputFileStream = new FileStream(inputPath, FileMode.Open);
-
-            // CryptoStream must be disposed before fileStream
-            using (var cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(), CryptoStreamMode.Write, leaveOpen: true))
-            {
-                await inputFileStream.CopyToAsync(cryptoStream);
-            }
+            using var cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(), CryptoStreamMode.Write, leaveOpen: true);
+            await inputFileStream.CopyToAsync(cryptoStream);
         }
 
 

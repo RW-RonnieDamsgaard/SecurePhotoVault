@@ -2,30 +2,40 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SecurePhotoVaultMAUI.ViewModels"
+             xmlns:converters="clr-namespace:SecurePhotoVaultMAUI.Converters"
              x:Class="SecurePhotoVaultMAUI.Views.MainPage">
-    
+
+
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </ContentPage.Resources>
     <ContentPage.BindingContext>
         <vm:MainPageViewModel />
     </ContentPage.BindingContext>
-    
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Log ud" Command="{Binding LogoutCommand}" />
+        <ToolbarItem Text="Tilføj billede" Command="{Binding AddImageCommand}" />
     </ContentPage.ToolbarItems>
-    
-    <VerticalStackLayout Padding="20">
-        <Button Text="Vælg billede og krypter" Command="{Binding EncryptCommand}" />
-        <Button Text="Dekryptér billede" Command="{Binding DecryptCommand}" IsVisible="{Binding IsLoggedIn}" />
-        <Button Text="Log ud" Command="{Binding LogoutCommand}" />
-    
 
-    <CollectionView ItemsSource="{Binding Images}" Margin="10">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <Frame BorderColor="Gray" Padding="5" Margin="5">
-                    <Image Source="{Binding FilePath}" Aspect="AspectFill" HeightRequest="200" />
-                </Frame>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
-    </VerticalStackLayout>
+    <Grid RowDefinitions="Auto,*" Padding="20">
+        
+        <CollectionView ItemsSource="{Binding Images}" Grid.Row="1">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout>
+                        <Image Source="{Binding DecryptedFilePath}" IsVisible="{Binding IsDecrypted}" HeightRequest="200"/>
+                        <Image Source="dotnet_bot.png" IsVisible="{Binding IsDecrypted, Converter={StaticResource InverseBoolConverter}}" HeightRequest="200"/>
+                        <Button Text="Dekrypter"
+        Command="{Binding DecryptCommand}"
+        IsVisible="{Binding IsDecrypted, Converter={StaticResource InverseBoolConverter}}" />
+
+                        <Button Text="Krypter"
+        Command="{Binding EncryptCommand}"
+        IsVisible="{Binding IsDecrypted}" />
+                        <Button Text="Slet" Command="{Binding DeleteCommand}" />
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>
