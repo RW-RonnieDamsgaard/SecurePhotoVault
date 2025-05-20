@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SecurePhotoVaultMAUI.ViewModels"
+             x:Class="SecurePhotoVaultMAUI.Views.LoginPage"
+             Title="LoginPage">
+    <ContentPage.BindingContext>
+        <vm:LoginViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Padding="30">
+        <Label Text="Adgangskode" />
+        <Entry Text="{Binding Password}" IsPassword="True" />
+
+        <Label Text="Bekræft adgangskode (ved registrering)" />
+        <Entry Text="{Binding ConfirmPassword}" IsPassword="True" />
+
+        <Button Text="Registrer" Command="{Binding RegisterCommand}" />
+        <Button Text="Login" Command="{Binding LoginCommand}" />
+    </VerticalStackLayout>
+</ContentPage>
