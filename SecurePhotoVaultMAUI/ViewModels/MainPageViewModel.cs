@@ -129,21 +129,53 @@ namespace SecurePhotoVaultMAUI.ViewModels
             await LoadImagesAsync(); // Opdater listen, så visningen matcher filsystemet
         }
 
-        // Fjern denne metode, da den ikke længere matcher filnavnene
-        // private async Task DecryptImageAsync() { ... }
 
         private async Task LogoutAsync()
         {
             IsBusy = true;
-            await AuthService.LogoutAsync();
+
+            // 1. Find og re-krypter alle ukrypterede billeder (plain_*)
+            var plainFiles = Directory.GetFiles(FileSystem.AppDataDirectory, "plain_*.*");
+
+            foreach (var file in plainFiles)
+            {
+                try
+                {
+                    await ImageCryptoService.EncryptImageAsync(file);
+                    File.Delete(file); // slet den ukrypterede version
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Fejl ved re-kryptering af {file}: {ex.Message}");
+                }
+            }
+
+            // 2. Fjern loginstatus og evt. nøgle
+            //await AuthService.LogoutAsync();
+
+            // 3. Navigér til login-side
             await Task.Delay(200);
             await Shell.Current.GoToAsync("//LoginPage");
+
+            Images.Clear();
+
+
             IsBusy = false;
         }
 
         private async void CheckLoginStatus()
         {
             IsLoggedIn = await AuthService.IsLoggedInAsync();
+        }
+
+        public async void CheckLoginStatusOnAppearing()
+        {
+            IsLoggedIn = await AuthService.IsLoggedInAsync();
+
+            if (IsLoggedIn)
+            {
+                await LoadImagesAsync();
+            }
         }
 
 
@@ -189,12 +221,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 });
                 Images.Add(item);
             }
-        }
-        private string CopyImageToTemp(string sourcePath)
-        {
-            var tempPath = Path.Combine(FileSystem.CacheDirectory, Path.GetFileName(sourcePath));
-            File.Copy(sourcePath, tempPath, true);
-            return tempPath;
         }
 
         public ObservableCollection<ImageItem> Images { get; set; } = new();

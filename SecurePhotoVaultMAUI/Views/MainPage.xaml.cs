@@ -10,6 +10,16 @@ namespace SecurePhotoVaultMAUI.Views
             InitializeComponent();
             BindingContext = vm;
         }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (BindingContext is MainPageViewModel vm)
+            {
+                vm.CheckLoginStatusOnAppearing(); // ny metode du tilføjer
+            }
+        }
     }
 
 }
