@@ -41,7 +41,7 @@ namespace SecurePhotoVaultMAUI.Services
         public static async Task LogoutAsync()
         {
             await Microsoft.Maui.Storage.SecureStorage.SetAsync("is-logged-in", "false");
-            Microsoft.Maui.Storage.SecureStorage.Remove("aes-key");
+            //Microsoft.Maui.Storage.SecureStorage.Remove("aes-key");
 
         }
     }

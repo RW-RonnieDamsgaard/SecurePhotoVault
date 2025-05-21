@@ -8,6 +8,7 @@ using System.Windows.Input;
 using SecurePhotoVaultMAUI.SecureStorage;
 using SecurePhotoVaultMAUI.Services;
 using System.Collections.ObjectModel;
+using SecurePhotoVaultMAUI.Helper;
 
 namespace SecurePhotoVaultMAUI.ViewModels
 {
@@ -92,6 +93,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
 
         private async Task EncryptImageAsync(ImageItem item)
         {
+            App.TouchSession();
             if (!string.IsNullOrEmpty(item.DecryptedFilePath) && File.Exists(item.DecryptedFilePath))
             {
                 await ImageCryptoService.EncryptImageAsync(item.DecryptedFilePath);
@@ -106,6 +108,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
 
         private async Task DecryptImageAsync(ImageItem item)
         {
+            App.TouchSession();
             var decryptedFile = Path.Combine(
                 FileSystem.AppDataDirectory,
                 $"plain_{Guid.NewGuid()}.jpg"
@@ -134,21 +137,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
         {
             IsBusy = true;
 
-            // 1. Find og re-krypter alle ukrypterede billeder (plain_*)
-            var plainFiles = Directory.GetFiles(FileSystem.AppDataDirectory, "plain_*.*");
-
-            foreach (var file in plainFiles)
-            {
-                try
-                {
-                    await ImageCryptoService.EncryptImageAsync(file);
-                    File.Delete(file); // slet den ukrypterede version
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Fejl ved re-kryptering af {file}: {ex.Message}");
-                }
-            }
+            await SessionSecurityHelper.RekrypterAllePlainBillederAsync();
 
             // 2. Fjern loginstatus og evt. nøgle
             //await AuthService.LogoutAsync();

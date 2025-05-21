@@ -14,7 +14,7 @@ namespace SecurePhotoVaultMAUI.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-
+            App.TouchSession();
             if (BindingContext is MainPageViewModel vm)
             {
                 vm.CheckLoginStatusOnAppearing(); // ny metode du tilføjer

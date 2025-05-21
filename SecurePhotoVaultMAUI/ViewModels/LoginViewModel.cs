@@ -41,6 +41,14 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 return;
             }
 
+            if (!PasswordValidator.IsPasswordStrong(Password))
+            {
+                await Shell.Current.DisplayAlert("Svag adgangskode",
+                    "Adgangskoden skal være mindst 8 tegn og indeholde både store og små bogstaver, tal og specialtegn.",
+                    "OK");
+                return;
+            }
+
             await AuthService.RegisterAsync(Password);
             await AuthService.SetLoginStatusAsync(true);
             await Shell.Current.GoToAsync("//MainPage");
