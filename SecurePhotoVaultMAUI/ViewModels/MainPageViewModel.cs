@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows.Input;
 using SecurePhotoVaultMAUI.SecureStorage;
 using SecurePhotoVaultMAUI.Services;
@@ -49,7 +44,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
             LogoutCommand = new Command(async () => await LogoutAsync());
 
             CheckLoginStatus();
-            LoadImagesAsync();
+            //LoadImagesAsync();
         }
 
         private async Task AddImageAsync()
@@ -114,10 +109,8 @@ namespace SecurePhotoVaultMAUI.ViewModels
 
             await ImageCryptoService.DecryptImageAsync(item.EncryptedFilePath, decryptedFile);
 
-            // Slet den krypterede fil
             File.Delete(item.EncryptedFilePath);
 
-            // Opdater item til at være et dekrypteret billede
             item.EncryptedFilePath = null;
             item.DecryptedFilePath = decryptedFile;
             item.IsDecrypted = true;
@@ -127,7 +120,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
             item.OnPropertyChanged(nameof(item.DecryptedFilePath));
             item.OnPropertyChanged(nameof(item.IsDecrypted));
 
-            await LoadImagesAsync(); // Opdater listen, så visningen matcher filsystemet
+            await LoadImagesAsync();
         }
 
 
@@ -137,15 +130,10 @@ namespace SecurePhotoVaultMAUI.ViewModels
 
             await SessionSecurityHelper.RekrypterAllePlainBillederAsync();
 
-            // 2. Fjern loginstatus og evt. nøgle
-            //await AuthService.LogoutAsync();
-
-            // 3. Navigér til login-side
             await Task.Delay(200);
             await Shell.Current.GoToAsync("//LoginPage");
 
             Images.Clear();
-
 
             IsBusy = false;
         }
@@ -173,7 +161,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
 
             Images.Clear();
 
-            // Indlæs krypterede billeder
             var encryptedFiles = Directory.GetFiles(FileSystem.AppDataDirectory, "encrypted_*.img");
             foreach (var file in encryptedFiles)
             {
@@ -191,7 +178,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 Images.Add(item);
             }
 
-            // Indlæs ukrypterede billeder (plain)
             var plainFiles = Directory.GetFiles(FileSystem.AppDataDirectory, "plain_*.*");
             foreach (var file in plainFiles)
             {

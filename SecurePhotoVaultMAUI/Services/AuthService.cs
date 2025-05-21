@@ -13,7 +13,7 @@ namespace SecurePhotoVaultMAUI.Services
         private const string KeyHash = "user-password-hash";
 
         public static async Task<bool> RegisterAsync(string password)
-        {// 1. Generér en salt
+        {
             var saltBytes = new byte[16];
             using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
             {
@@ -49,15 +49,11 @@ namespace SecurePhotoVaultMAUI.Services
         public static async Task LogoutAsync()
         {
             await Microsoft.Maui.Storage.SecureStorage.SetAsync("is-logged-in", "false");
-            //Microsoft.Maui.Storage.SecureStorage.Remove("aes-key");
-
         }
         public static void ClearUserDataAsync()
         {
             Microsoft.Maui.Storage.SecureStorage.Default.Remove("user-salt");
-            Microsoft.Maui.Storage.SecureStorage.Default.Remove("login-status");
             Microsoft.Maui.Storage.SecureStorage.Default.Remove("user-password-hash");
-            // Evt. ryd andet: krypterede filer mv.
         }
     }
 }
