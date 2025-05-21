@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Isopoh.Cryptography.Argon2;
 
+
 namespace SecurePhotoVaultMAUI.Services
 {
     public static class AuthService
@@ -12,9 +13,16 @@ namespace SecurePhotoVaultMAUI.Services
         private const string KeyHash = "user-password-hash";
 
         public static async Task<bool> RegisterAsync(string password)
-        {
+        {// 1. Generér en salt
+            var saltBytes = new byte[16];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(saltBytes);
+            }
+            var salt = Convert.ToBase64String(saltBytes);
             var hash = Argon2.Hash(password);
             await Microsoft.Maui.Storage.SecureStorage.SetAsync(KeyHash, hash);
+            await Microsoft.Maui.Storage.SecureStorage.SetAsync("user-salt", salt);
             return true;
         }
 
@@ -43,6 +51,13 @@ namespace SecurePhotoVaultMAUI.Services
             await Microsoft.Maui.Storage.SecureStorage.SetAsync("is-logged-in", "false");
             //Microsoft.Maui.Storage.SecureStorage.Remove("aes-key");
 
+        }
+        public static void ClearUserDataAsync()
+        {
+            Microsoft.Maui.Storage.SecureStorage.Default.Remove("user-salt");
+            Microsoft.Maui.Storage.SecureStorage.Default.Remove("login-status");
+            Microsoft.Maui.Storage.SecureStorage.Default.Remove("user-password-hash");
+            // Evt. ryd andet: krypterede filer mv.
         }
     }
 }

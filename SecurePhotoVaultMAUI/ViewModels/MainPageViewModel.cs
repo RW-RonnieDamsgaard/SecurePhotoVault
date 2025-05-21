@@ -46,8 +46,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
             AddImageCommand = new Command(async () => await AddImageAsync());
             EncryptCommand = new Command<ImageItem>(async item => await EncryptImageAsync(item));
             DecryptCommand = new Command<ImageItem>(async item => await DecryptImageAsync(item));
-            //EncryptCommand = new Command(async () => await EncryptImageAsync());
-            //DecryptCommand = new Command(async () => await DecryptImageAsync());
             LogoutCommand = new Command(async () => await LogoutAsync());
 
             CheckLoginStatus();
@@ -211,6 +209,15 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 Images.Add(item);
             }
         }
+
+        public ICommand ResetCommand => new Command(async () =>
+        {
+            bool confirm = await Shell.Current.DisplayAlert("Nulstil", "Er du sikker på, at du vil nulstille appen? Alle billeder slettes ikke automatisk.", "Ja", "Nej");
+            if (!confirm) return;
+
+            AuthService.ClearUserDataAsync();
+            await Shell.Current.GoToAsync("//LoginPage");
+        });
 
         public ObservableCollection<ImageItem> Images { get; set; } = new();
 

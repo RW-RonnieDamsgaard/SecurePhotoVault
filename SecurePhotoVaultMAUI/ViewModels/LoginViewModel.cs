@@ -12,8 +12,12 @@ namespace SecurePhotoVaultMAUI.ViewModels
     public class LoginViewModel : INotifyPropertyChanged
     {
         private bool isBusy;
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
+        private bool isAlreadyRegistered;
+        private string password;
+        private string confirmPassword;
+        public bool IsNotRegistered => !IsAlreadyRegistered;
+
+        
 
         public ICommand RegisterCommand { get; }
         public ICommand LoginCommand { get; }
@@ -22,6 +26,36 @@ namespace SecurePhotoVaultMAUI.ViewModels
         {
             RegisterCommand = new Command(async () => await RegisterAsync());
             LoginCommand = new Command(async () => await LoginAsync());
+            //CheckIfRegisteredAsync();
+        }
+        public string Password
+        {
+            get => password;
+            set
+            {
+                if (password != value)
+                {
+                    password = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Password)));
+                }
+            }
+        }
+        public string ConfirmPassword
+        {
+            get => confirmPassword;
+            set
+            {
+                if (confirmPassword != value)
+                {
+                    confirmPassword = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ConfirmPassword)));
+                }
+            }
+        }
+        public async Task CheckIfRegisteredAsync()
+        {
+            var existingSalt = await Microsoft.Maui.Storage.SecureStorage.GetAsync("user-salt");
+            IsAlreadyRegistered = !string.IsNullOrEmpty(existingSalt);
         }
 
         public bool IsBusy
@@ -53,7 +87,17 @@ namespace SecurePhotoVaultMAUI.ViewModels
             await AuthService.SetLoginStatusAsync(true);
             await Shell.Current.GoToAsync("//MainPage");
         }
+        public bool IsAlreadyRegistered
+        {
+            get => isAlreadyRegistered;
+            set
+            {
+                isAlreadyRegistered = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAlreadyRegistered)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsNotRegistered)));
 
+            }
+        }
         private async Task LoginAsync()
         {
             if (IsBusy) return;

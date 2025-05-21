@@ -31,7 +31,7 @@ namespace SecurePhotoVaultMAUI
 
         private void StartSessionTimer()
         {
-            _sessionTimer = new System.Timers.Timer(10000); // Tjek hvert 10. sekund
+            _sessionTimer = new System.Timers.Timer(10000);
             _sessionTimer.Elapsed += async (sender, args) =>
             {
                 var now = DateTime.Now;

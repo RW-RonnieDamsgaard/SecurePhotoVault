@@ -3,7 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SecurePhotoVaultMAUI.ViewModels"
              x:Class="SecurePhotoVaultMAUI.Views.LoginPage"
+             xmlns:converters="clr-namespace:SecurePhotoVaultMAUI.Converters"
              Title="LoginPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.BindingContext>
         <vm:LoginViewModel />
     </ContentPage.BindingContext>
@@ -12,10 +20,15 @@
         <Label Text="Adgangskode" />
         <Entry Text="{Binding Password}" IsPassword="True" />
 
-        <Label Text="Bekræft adgangskode (ved registrering)" />
-        <Entry Text="{Binding ConfirmPassword}" IsPassword="True" />
-
-        <Button Text="Registrer" Command="{Binding RegisterCommand}" />
-        <Button Text="Login" Command="{Binding LoginCommand}" />
+        <Entry Placeholder="Bekræft adgangskode"
+       IsVisible="{Binding IsAlreadyRegistered, Converter={StaticResource InverseBoolConverter}}"
+       Text="{Binding ConfirmPassword}"
+       IsPassword="True"/>
+        <Button Text="Opret konto"
+        IsVisible="{Binding IsAlreadyRegistered, Converter={StaticResource InverseBoolConverter}}"
+        Command="{Binding RegisterCommand}" />
+        <Button Text="Login"
+        Command="{Binding LoginCommand}"
+        IsVisible="{Binding IsAlreadyRegistered}" />
     </VerticalStackLayout>
 </ContentPage>
