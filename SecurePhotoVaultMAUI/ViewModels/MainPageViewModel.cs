@@ -15,6 +15,8 @@ namespace SecurePhotoVaultMAUI.ViewModels
         public ICommand LogoutCommand { get; }
         public ICommand AddImageCommand { get; }
 
+
+
         public MainPageViewModel()
         {
             AddImageCommand = new Command(async () => await AddImageAsync());
@@ -24,6 +26,9 @@ namespace SecurePhotoVaultMAUI.ViewModels
 
             CheckLoginStatus();
         }
+
+        public ObservableCollection<ImageItem> Images { get; set; } = new();
+
 
         private bool isLoggedIn;
         public bool IsLoggedIn
@@ -45,7 +50,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
             }
         }
-
+        // User picks an image from the file system
         private async Task AddImageAsync()
         {
             var file = await FilePicker.PickAsync(new PickOptions
@@ -81,7 +86,7 @@ namespace SecurePhotoVaultMAUI.ViewModels
             });
             Images.Add(item);
         }
-
+        // Encrypt the image
         private async Task EncryptImageAsync(ImageItem item)
         {
             App.TouchSession();
@@ -93,10 +98,10 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 item.IsDecrypted = false;
                 item.OnPropertyChanged(nameof(item.DecryptedFilePath));
                 item.OnPropertyChanged(nameof(item.IsDecrypted));
-                await LoadImagesAsync(); // Opdater listen
+                await LoadImagesAsync();
             }
         }
-
+        // Decrypt the image
         private async Task DecryptImageAsync(ImageItem item)
         {
             App.TouchSession();
@@ -202,7 +207,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
             await Shell.Current.GoToAsync("//LoginPage");
         });
 
-        public ObservableCollection<ImageItem> Images { get; set; } = new();
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
