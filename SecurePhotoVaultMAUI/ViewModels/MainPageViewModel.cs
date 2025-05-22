@@ -15,6 +15,16 @@ namespace SecurePhotoVaultMAUI.ViewModels
         public ICommand LogoutCommand { get; }
         public ICommand AddImageCommand { get; }
 
+        public MainPageViewModel()
+        {
+            AddImageCommand = new Command(async () => await AddImageAsync());
+            EncryptCommand = new Command<ImageItem>(async item => await EncryptImageAsync(item));
+            DecryptCommand = new Command<ImageItem>(async item => await DecryptImageAsync(item));
+            LogoutCommand = new Command(async () => await LogoutAsync());
+
+            CheckLoginStatus();
+        }
+
         private bool isLoggedIn;
         public bool IsLoggedIn
         {
@@ -34,17 +44,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 isBusy = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
             }
-        }
-
-        public MainPageViewModel()
-        {
-            AddImageCommand = new Command(async () => await AddImageAsync());
-            EncryptCommand = new Command<ImageItem>(async item => await EncryptImageAsync(item));
-            DecryptCommand = new Command<ImageItem>(async item => await DecryptImageAsync(item));
-            LogoutCommand = new Command(async () => await LogoutAsync());
-
-            CheckLoginStatus();
-            //LoadImagesAsync();
         }
 
         private async Task AddImageAsync()
@@ -82,7 +81,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
             });
             Images.Add(item);
         }
-
 
         private async Task EncryptImageAsync(ImageItem item)
         {
@@ -152,7 +150,6 @@ namespace SecurePhotoVaultMAUI.ViewModels
                 await LoadImagesAsync();
             }
         }
-
 
         private async Task LoadImagesAsync()
         {
